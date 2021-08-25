@@ -17,14 +17,16 @@ def main():
 
     best_solution = coord_nodes
     best_dist_solution = float('inf')
+    solutions = []
 
+    # rodando a subida de encosta 10 vezes
     for _ in range(10):
         random_config = generate_random_config(coord_nodes)
         distance = get_travelled_dist(random_config)
 
         solution, dist_solution, iter_num = hill_climbing(distance, random_config, 1)
 
-        # print(solution)
+        solutions.append([solution, dist_solution])
         print("distance: ", dist_solution, ", number of iter: ", iter_num)
 
         if (dist_solution < best_dist_solution):
@@ -44,6 +46,7 @@ def generate_random_config(coord_nodes):
 
 def get_travelled_dist(solution):
     distance = 0
+    # calcula a distancia euclidiana de um nó para o nó seguinte
     for i in range(len(solution) - 1):
         distance += math.dist(solution[i], solution[i + 1])
 
@@ -52,12 +55,15 @@ def get_travelled_dist(solution):
 
 def generate_childs_config(solution):
     n_swap_pairs = 3
+    n_childs = 1000
     childs = []
 
-    for _ in range(1000):
+    for _ in range(n_childs):
         child = copy.deepcopy(solution)
 
+        # seleciona indice dos pares que serão trocados
         swaps = random.sample(range(len(child)), n_swap_pairs*2)
+        # shuffle para a troca ser mais aleatoria (não sequencial)
         random.shuffle(swaps)
         
         for i in range(n_swap_pairs):
@@ -84,11 +90,10 @@ def get_best_child(childs):
 def hill_climbing(curr_best_dist, curr_solution, iter_num):
     childs = generate_childs_config(curr_solution)
     curr_best_child_dist, curr_best_child = get_best_child(childs)
+
     if curr_best_child_dist < curr_best_dist:
         return hill_climbing(curr_best_child_dist, curr_best_child, iter_num+1)
     else:
-        # print("local minimum found:", curr_solution)
-        # print("local minimum dist:", curr_best_dist)
         return [curr_solution, curr_best_dist, iter_num]
     
 
