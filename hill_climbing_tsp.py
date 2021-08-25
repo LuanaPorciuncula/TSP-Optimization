@@ -1,10 +1,13 @@
 import random
 import math
+import copy
 # import matplotlib.pyplot as plt
 
 
 def generate_random_config(coord_nodes):
-    random.shuffle(coord_nodes)
+    random_config = copy.deepcopy(coord_nodes)
+    random.shuffle(random_config)
+    return random_config
     
 
 def get_travelled_dist(solution):
@@ -17,11 +20,18 @@ def get_travelled_dist(solution):
 
 
 def generate_childs_config(solution):
+    n_swap_pairs = 3
     childs = []
-    for i in range(len(solution) - 1):
-        child = solution
-        # swap neighbor node
-        child[i], child[i+1] = child[i+1], child[i]
+
+    for _ in range(15):
+        child = copy.deepcopy(solution)
+
+        swaps = random.sample(range(len(child)), n_swap_pairs*2)
+        random.shuffle(swaps)
+
+        for i in range(n_swap_pairs):
+            child[i], child[i+n_swap_pairs] = child[i+n_swap_pairs], child[i]
+
         childs.append(child)
     return childs
 
@@ -64,21 +74,21 @@ def main():
     best_solution = coord_nodes
     best_dist_solution = float('inf')
 
-    for _ in range(10):
-        generate_random_config(coord_nodes)
-        distance = get_travelled_dist(coord_nodes)
+    while True:
+        random_config = generate_random_config(coord_nodes)
+        distance = get_travelled_dist(random_config)
 
-        solution = hill_climbing(distance, coord_nodes)
-        print(solution[0], solution[1])
+        solution = hill_climbing(distance, random_config)
+        # print(solution[0], solution[1])
 
         if (solution[1] < best_dist_solution):
             best_solution = solution[0]
             best_dist_solution = solution[1]
             print("NEW BEST", best_dist_solution)
-        print("------------------------------")
+        #print("------------------------------")
     
     print("BEST ITERATION: ",best_solution, best_dist_solution)
-
+    
 
 if __name__ == "__main__":
     main()
